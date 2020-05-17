@@ -1,10 +1,11 @@
 defmodule ShopWeb.SignupLive do
-  use Phoenix.LiveView
+  use ShopWeb, :live_view
 
   import Phoenix.HTML.Form
 
   import ShopWeb.Live.Helper,
     only: [
+      signing_salt: 0,
       showing_error: 3,
       aria_hidden: 3,
       detail_error: 3,
@@ -92,12 +93,12 @@ defmodule ShopWeb.SignupLive do
   end
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(_params, %{"session_uuid" => key}, socket) do
     changeset =
       Shop.Form.changeset(%Shop.Form{}, %{membership_id: "PERSONAL"})
       |> Map.put(:action, :insert)
 
-    {:ok, assign(socket, changeset: changeset)}
+    {:ok, assign(socket, key: key, changeset: changeset)}
   end
 
   @impl true
@@ -192,10 +193,12 @@ defmodule ShopWeb.SignupLive do
   end
 
   @impl true
-  def handle_info({:disable_form, changeset}, socket) do
+  def handle_info({:disable_form, changeset}, %{assigns: %{:key => key}} = socket) do
     case Shop.Form.create_user(changeset) do
-      %Shop.User{} ->
-        path = Routes.page_path(socket, :index)
+      %Shop.User{id: user_id} ->
+        insert_session_token(key, user_id)
+
+        path = Routes.shop_path(socket, :index)
         redirect = socket |> redirect(to: path)
 
         {:noreply, redirect}
@@ -207,5 +210,11 @@ defmodule ShopWeb.SignupLive do
 
         {:noreply, assign(socket, changeset: changeset)}
     end
+  end
+
+  def insert_session_token(key, user_id) do
+    salt = signing_salt()
+    token = Phoenix.Token.sign(ShopWeb.Endpoint, salt, user_id)
+    :ets.insert(:shop_auth_table, {:"#{key}", token})
   end
 end

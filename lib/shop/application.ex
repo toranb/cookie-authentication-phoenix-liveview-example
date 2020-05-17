@@ -19,6 +19,8 @@ defmodule Shop.Application do
       # {Shop.Worker, arg}
     ]
 
+    :ets.new(:shop_auth_table, [:set, :public, :named_table, read_concurrency: true])
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Shop.Supervisor]

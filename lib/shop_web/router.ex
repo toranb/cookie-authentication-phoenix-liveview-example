@@ -1,6 +1,8 @@
 defmodule ShopWeb.Router do
   use ShopWeb, :router
 
+  import ShopWeb.Plug.Session, only: [redirect_unauthorized: 2, validate_session: 2]
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,6 +10,12 @@ defmodule ShopWeb.Router do
     plug :put_root_layout, {ShopWeb.LayoutView, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :validate_session
+  end
+
+  pipeline :restricted do
+    plug :browser
+    plug :redirect_unauthorized
   end
 
   pipeline :api do
@@ -17,8 +25,16 @@ defmodule ShopWeb.Router do
   scope "/", ShopWeb do
     pipe_through :browser
 
+    get "/logout", LogoutController, :index
     live "/", PageLive, :index
     live "/signup", SignupLive, :index
+    live "/login", LoginLive, :index
+  end
+
+  scope "/shop", ShopWeb do
+    pipe_through :restricted
+
+    live "/", ShopLive, :index
   end
 
   # Other scopes may use custom stacks.
