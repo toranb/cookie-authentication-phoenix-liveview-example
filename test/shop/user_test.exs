@@ -8,6 +8,7 @@ defmodule Shop.UserTest do
   @email "toranb@gmail.com"
   @password "abcd1234"
   @membership "MEMBER"
+  @password_message "Password must be between 8 and 20 characters"
 
   test "email is required" do
     attrs = valid_attrs() |> Map.put("email", "")
@@ -47,8 +48,7 @@ defmodule Shop.UserTest do
 
     assert Map.get(changeset, :errors) == [
              password:
-               {"password must be 8-20 characters",
-                [count: 8, validation: :length, kind: :min, type: :string]}
+               {@password_message, [count: 8, validation: :length, kind: :min, type: :string]}
            ]
   end
 
@@ -59,8 +59,7 @@ defmodule Shop.UserTest do
 
     assert Map.get(changeset, :errors) == [
              password:
-               {"password must be 8-20 characters",
-                [count: 20, validation: :length, kind: :max, type: :string]}
+               {@password_message, [count: 20, validation: :length, kind: :max, type: :string]}
            ]
   end
 

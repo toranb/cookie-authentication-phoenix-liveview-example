@@ -1,9 +1,11 @@
-defmodule Shop.Form do
+defmodule Shop.Signup.Form do
   use Ecto.Schema
 
   import Ecto.Changeset
 
   alias Shop.User
+
+  @password_message "Password must be between 8 and 20 characters"
 
   schema "signup_form" do
     field :email, :string
@@ -34,9 +36,11 @@ defmodule Shop.Form do
   def changeset(user, params \\ %{}) do
     user
     |> cast(params, @required_attrs ++ @optional_attrs)
-    |> validate_required(@required_attrs)
+    |> validate_required(:email, message: "Email address is required")
+    |> validate_required(:password, message: @password_message)
+    |> validate_required(:membership_id, message: "Membership is required")
     |> validate_format(:email, ~r/@/)
-    |> validate_length(:password, min: 8, max: 20, message: "password must be 8-20 characters")
+    |> validate_length(:password, min: 8, max: 20, message: @password_message)
   end
 
   def create_user(%Ecto.Changeset{valid?: false} = changeset), do: changeset

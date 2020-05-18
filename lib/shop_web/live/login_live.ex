@@ -2,6 +2,7 @@ defmodule ShopWeb.LoginLive do
   use ShopWeb, :live_view
 
   import Phoenix.HTML.Form
+  import ShopWeb.ErrorHelpers
 
   import ShopWeb.Live.Helper,
     only: [
@@ -47,7 +48,7 @@ defmodule ShopWeb.LoginLive do
                   <label class="text-gray-500" for="form_password">Password</label>
                 </div>
                 <div aria-live="polite" aria-hidden="<%= aria_hidden(f, @changeset, :password) %>" id="form_password_detail" class="<%= detail_error(f, @changeset, :password) %> detail bg-shop-info pt-2 pb-2 pl-5 pr-4 rounded rounded-t-none relative block border-t-0 border">
-                  <span aria-hidden="<%= aria_hidden(f, @changeset, :password) %>" class="text-left text-sm text-shop-black">Password must be 8-20 characters</span>
+                  <span aria-hidden="<%= aria_hidden(f, @changeset, :password) %>" class="text-left text-sm text-shop-black"><%= error_tag f, :password %></span>
                 </div>
               </div>
 

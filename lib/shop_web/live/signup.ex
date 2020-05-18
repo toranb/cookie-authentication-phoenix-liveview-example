@@ -2,6 +2,7 @@ defmodule ShopWeb.SignupLive do
   use ShopWeb, :live_view
 
   import Phoenix.HTML.Form
+  import ShopWeb.ErrorHelpers
 
   import ShopWeb.Live.Helper,
     only: [
@@ -13,6 +14,8 @@ defmodule ShopWeb.SignupLive do
       submit_value: 2,
       is_disabled: 1
     ]
+
+  alias Shop.Signup
 
   alias ShopWeb.Router.Helpers, as: Routes
 
@@ -73,7 +76,7 @@ defmodule ShopWeb.SignupLive do
                   <label class="text-gray-500" for="form_password">Password</label>
                 </div>
                 <div aria-live="polite" aria-hidden="<%= aria_hidden(f, @changeset, :password) %>" id="form_password_detail" class="<%= detail_error(f, @changeset, :password) %> detail bg-shop-info pt-2 pb-2 pl-5 pr-4 rounded rounded-t-none relative block border-t-0 border">
-                  <span aria-hidden="<%= aria_hidden(f, @changeset, :password) %>" class="text-left text-sm text-shop-black">Password must be 8-20 characters</span>
+                  <span aria-hidden="<%= aria_hidden(f, @changeset, :password) %>" class="text-left text-sm text-shop-black"><%= error_tag f, :password %></span>
                 </div>
               </div>
 
@@ -95,7 +98,7 @@ defmodule ShopWeb.SignupLive do
   @impl true
   def mount(_params, %{"session_uuid" => key}, socket) do
     changeset =
-      Shop.Form.changeset(%Shop.Form{}, %{membership_id: "PERSONAL"})
+      Signup.Form.changeset(%Signup.Form{}, %{membership_id: "PERSONAL"})
       |> Map.put(:action, :insert)
 
     {:ok, assign(socket, key: key, changeset: changeset)}
@@ -105,7 +108,7 @@ defmodule ShopWeb.SignupLive do
   def handle_event("save", %{"form" => params}, socket) do
     if Map.get(params, "form_disabled", nil) != "true" do
       changeset =
-        Shop.Form.changeset(%Shop.Form{}, params)
+        Signup.Form.changeset(%Signup.Form{}, params)
         |> Ecto.Changeset.put_change(:form_submitted, true)
         |> Ecto.Changeset.put_change(:form_disabled, true)
         |> Map.put(:action, :insert)
@@ -120,7 +123,7 @@ defmodule ShopWeb.SignupLive do
 
   @impl true
   def handle_event("validate", %{"form" => params}, socket) do
-    changeset = Shop.Form.changeset(%Shop.Form{}, params) |> Map.put(:action, :insert)
+    changeset = Signup.Form.changeset(%Signup.Form{}, params) |> Map.put(:action, :insert)
     {:noreply, assign(socket, changeset: changeset)}
   end
 
@@ -194,7 +197,7 @@ defmodule ShopWeb.SignupLive do
 
   @impl true
   def handle_info({:disable_form, changeset}, %{assigns: %{:key => key}} = socket) do
-    case Shop.Form.create_user(changeset) do
+    case Signup.Form.create_user(changeset) do
       %Shop.User{id: user_id} ->
         insert_session_token(key, user_id)
 

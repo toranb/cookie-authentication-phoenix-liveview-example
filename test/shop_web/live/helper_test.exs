@@ -1,14 +1,14 @@
 defmodule Shop.Live.HelperTest do
   use ExUnit.Case, async: true
 
-  alias Shop.Form
+  alias Shop.Signup
   alias ShopWeb.Live.Helper
 
   test "when password blank showing_error returns margin" do
     f = %{errors: nil}
 
     attrs = valid_attrs() |> Map.put("password", "")
-    changeset = Form.changeset(%Form{}, attrs)
+    changeset = Signup.Form.changeset(%Signup.Form{}, attrs)
 
     result = Helper.showing_error(f, changeset, :password)
     assert result == "mb-6"
@@ -24,7 +24,7 @@ defmodule Shop.Live.HelperTest do
       |> Map.put("form_submitted", true)
       |> Map.put("action", :insert)
 
-    changeset = Form.changeset(%Form{}, attrs)
+    changeset = Signup.Form.changeset(%Signup.Form{}, attrs)
 
     result = Helper.showing_error(f, changeset, :password)
     assert result == "mb-6"

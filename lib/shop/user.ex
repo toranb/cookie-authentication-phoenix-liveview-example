@@ -24,7 +24,7 @@ defmodule Shop.User do
     |> cast(params, @required_attrs)
     |> validate_required(@required_attrs)
     |> validate_format(:email, ~r/@/)
-    |> validate_length(:password, min: 8, max: 20, message: "password must be 8-20 characters")
+    |> validate_length(:password, min: 8, max: 20, message: "Password must be between 8 and 20 characters")
     |> foreign_key_constraint(:membership_id, name: :users_membership_id_fkey)
     |> create_password_hash()
   end
