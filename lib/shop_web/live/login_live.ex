@@ -67,12 +67,12 @@ defmodule ShopWeb.LoginLive do
   end
 
   @impl true
-  def mount(_params, %{"session_uuid" => key}, socket) do
+  def mount(_params, _, socket) do
     changeset =
       Login.Form.changeset(%Login.Form{}, %{})
       |> Map.put(:action, :insert)
 
-    {:ok, assign(socket, key: key, changeset: changeset)}
+    {:ok, assign(socket, changeset: changeset)}
   end
 
   @impl true
@@ -118,10 +118,10 @@ defmodule ShopWeb.LoginLive do
   end
 
   @impl true
-  def handle_info({:disable_form, changeset}, %{assigns: %{:key => key}} = socket) do
+  def handle_info({:disable_form, changeset}, socket) do
     case Login.Form.get_user_by_email(changeset) do
       %Shop.User{id: user_id} ->
-        insert_session_token(key, user_id)
+        :ets.insert(:shop_auth_table, {:user_id, "#{user_id}"})
 
         path = Routes.shop_path(socket, :index)
         redirect = socket |> redirect(to: path)
@@ -135,11 +135,5 @@ defmodule ShopWeb.LoginLive do
 
         {:noreply, assign(socket, changeset: changeset)}
     end
-  end
-
-  def insert_session_token(key, user_id) do
-    salt = signing_salt()
-    token = Phoenix.Token.sign(ShopWeb.Endpoint, salt, user_id)
-    :ets.insert(:shop_auth_table, {:"#{key}", token})
   end
 end
