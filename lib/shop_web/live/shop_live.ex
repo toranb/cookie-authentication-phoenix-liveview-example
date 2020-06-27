@@ -5,13 +5,18 @@ defmodule ShopWeb.ShopLive do
   def render(assigns) do
     ~L"""
     <main>
-      <p>Hello! You are authenticated!</p>
+      <p>Hello <%= @current_user.email %>! You are authenticated!</p>
     </main>
     """
   end
 
   @impl true
-  def mount(_params, _session, socket) do
+  def mount(_params, %{"user_id" => user_id}, socket) do
+    socket = assign_new(socket, :current_user, fn ->
+      Shop.User
+      |> Shop.Repo.get(user_id)
+    end)
+
     {:ok, socket}
   end
 end

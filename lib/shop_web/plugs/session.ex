@@ -32,7 +32,9 @@ defmodule ShopWeb.Plug.Session do
       [{_, token}] ->
         case Phoenix.Token.verify(ShopWeb.Endpoint, signing_salt(), token, max_age: 806_400) do
           {:ok, user_id} ->
-            assign(conn, :user_id, user_id)
+            conn
+            |> assign(:user_id, user_id)
+            |> put_session("user_id", user_id)
 
           _ ->
             conn
