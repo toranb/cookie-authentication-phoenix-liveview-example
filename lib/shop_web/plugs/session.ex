@@ -34,7 +34,6 @@ defmodule ShopWeb.Plug.Session do
           {:ok, user_id} ->
             conn
             |> assign(:user_id, user_id)
-            |> put_session("user_id", user_id)
 
           _ ->
             conn
