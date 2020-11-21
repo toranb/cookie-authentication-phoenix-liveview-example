@@ -1,4 +1,9 @@
 module.exports = {
+  purge: [
+    '../lib/shop_web/live/**/*.ex',
+    '../lib/shop_web/templates/layout/root.html.leex',
+  ],
+  darkMode: false,
   theme: {
     inset: {
       '0': '0',
@@ -25,7 +30,10 @@ module.exports = {
         'shop-link-blue': '#00a4df',
       }
     }
+
   },
   variants: {},
-  plugins: []
+  plugins: [
+    require('@tailwindcss/typography'),
+  ],
 }
